@@ -1,0 +1,56 @@
+# Base configuration for multimodal clinical AI
+device: cuda  # set to "cpu" for local dev without GPU
+
+model:
+  d_model: 512
+  num_heads: 8
+  dropout: 0.1
+  num_labels: 14
+
+  image:
+    backbone: vit_base_patch16_224
+    pretrained: true
+
+  text:
+    backbone: dmis-lab/biobert-base-cased-v1.1
+    max_len: 512
+
+  vitals:
+    encoder_type: lstm   # "lstm" or "transformer"
+    input_dim: 6
+    hidden_dim: 256
+    num_layers: 2
+    seq_len: 48
+
+training:
+  batch_size: 16
+  num_workers: 2
+  lr: 1.0e-4
+  weight_decay: 1.0e-2
+  epochs: 20
+  scheduler: cosine
+  grad_clip: 1.0
+  mixed_precision: true
+  log_interval: 50
+
+data:
+  image_size: 224
+  vitals_seq_len: 48
+  text_max_len: 512
+  num_labels: 14
+
+  # CheXpert label-uncertainty policy: "u_ones", "u_zeros", or "u_ignore"
+  uncertainty_policy: u_zeros
+  # Per-label override: U-Ones for these per CheXpert paper
+  uncertainty_u_ones: ["Atelectasis", "Edema"]
+
+paths:
+  data_root: data/
+  raw: data/raw/
+  processed: data/processed/
+  splits: data/splits/
+  checkpoints: checkpoints/
+
+wandb:
+  project: multimodal-clinical-ai
+  enabled: false   # set true to log

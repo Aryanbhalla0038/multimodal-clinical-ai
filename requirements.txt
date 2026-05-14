@@ -1,0 +1,33 @@
+# Core DL
+torch>=2.1.0
+torchvision>=0.16.0
+timm>=0.9.12
+transformers>=4.36.0
+sentencepiece>=0.1.99
+einops>=0.7.0
+
+# Data
+numpy>=1.24
+pandas>=2.0
+scikit-learn>=1.3
+Pillow>=10.0
+opencv-python-headless>=4.8.0
+pydicom>=2.4.0
+
+# XAI
+captum>=0.7.0
+shap>=0.44.0
+matplotlib>=3.7
+
+# Configs / Tracking
+pyyaml>=6.0
+wandb>=0.16.0
+tqdm>=4.66
+
+# Backend
+fastapi>=0.110.0
+uvicorn[standard]>=0.27.0
+python-multipart>=0.0.9
+
+# Tests
+pytest>=8.0

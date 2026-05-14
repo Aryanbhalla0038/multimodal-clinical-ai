@@ -1,0 +1,4 @@
+config,macro_AUC,macro_AP,time_min
+img_only,0.5069,0.211,17.2
+txt_only,0.9983,0.9165,22.5
+all_xattn,0.9986,0.9185,40.6

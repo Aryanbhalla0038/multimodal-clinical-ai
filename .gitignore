@@ -1,0 +1,41 @@
+# Patient data — NEVER commit
+data/raw/
+data/processed/
+data/splits/
+*.dcm
+*.nii
+*.nii.gz
+
+# Checkpoints
+checkpoints/
+*.pt
+*.pth
+*.ckpt
+
+# Logs
+wandb/
+runs/
+logs/
+*.log
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+env/
+.pytest_cache/
+.mypy_cache/
+.ipynb_checkpoints/
+
+# Node / React
+dashboard/node_modules/
+dashboard/build/
+dashboard/dist/
+
+# IDE
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

@@ -1,0 +1,149 @@
+[
+  {
+    "name": "img_only",
+    "best_macro_auc": 0.5068985681976484,
+    "best_macro_ap": 0.2110266350019483,
+    "time_min": 17.2,
+    "per_label_auc": {
+      "Atelectasis": 0.504,
+      "Cardiomegaly": 0.5,
+      "Consolidation": 0.5249,
+      "Edema": 0.4852,
+      "Enlarged Cardiomediastinum": 0.4885,
+      "Fracture": NaN,
+      "Lung Lesion": 0.5215,
+      "Lung Opacity": 0.5,
+      "No Finding": 0.5,
+      "Pleural Effusion": 0.5,
+      "Pleural Other": 0.5215,
+      "Pneumonia": 0.5221,
+      "Pneumothorax": 0.5221,
+      "Support Devices": 0.5
+    },
+    "history": [
+      {
+        "epoch": 1,
+        "macro_auc": 0.500919566568268,
+        "macro_ap": 0.2101388637418875
+      },
+      {
+        "epoch": 2,
+        "macro_auc": 0.4968893826541264,
+        "macro_ap": 0.21070414969444032
+      },
+      {
+        "epoch": 3,
+        "macro_auc": 0.500260485405871,
+        "macro_ap": 0.21144579626722484
+      },
+      {
+        "epoch": 4,
+        "macro_auc": 0.5068985681976484,
+        "macro_ap": 0.2110266350019483
+      },
+      {
+        "epoch": 5,
+        "macro_auc": 0.5042268792856072,
+        "macro_ap": 0.21114599351030114
+      }
+    ]
+  },
+  {
+    "name": "txt_only",
+    "best_macro_auc": 0.9982855490374287,
+    "best_macro_ap": 0.9165290333051747,
+    "time_min": 22.5,
+    "per_label_auc": {
+      "Atelectasis": 1.0,
+      "Cardiomegaly": 1.0,
+      "Consolidation": 1.0,
+      "Edema": 1.0,
+      "Enlarged Cardiomediastinum": 1.0,
+      "Fracture": NaN,
+      "Lung Lesion": 1.0,
+      "Lung Opacity": 1.0,
+      "No Finding": 0.9777,
+      "Pleural Effusion": 1.0,
+      "Pleural Other": 1.0,
+      "Pneumonia": 1.0,
+      "Pneumothorax": 1.0,
+      "Support Devices": 1.0
+    },
+    "history": [
+      {
+        "epoch": 1,
+        "macro_auc": 0.9982855490374287,
+        "macro_ap": 0.9165290333051747
+      },
+      {
+        "epoch": 2,
+        "macro_auc": 0.4590938188079378,
+        "macro_ap": 0.21124808990556415
+      },
+      {
+        "epoch": 3,
+        "macro_auc": 0.5533424723066012,
+        "macro_ap": 0.2303120265261032
+      },
+      {
+        "epoch": 4,
+        "macro_auc": 0.5299749532087271,
+        "macro_ap": 0.2151229434291567
+      },
+      {
+        "epoch": 5,
+        "macro_auc": 0.46384033105741573,
+        "macro_ap": 0.21546327578996613
+      }
+    ]
+  },
+  {
+    "name": "all_xattn",
+    "best_macro_auc": 0.99860571759068,
+    "best_macro_ap": 0.918477481879533,
+    "time_min": 40.6,
+    "per_label_auc": {
+      "Atelectasis": 1.0,
+      "Cardiomegaly": 1.0,
+      "Consolidation": 1.0,
+      "Edema": 1.0,
+      "Enlarged Cardiomediastinum": 1.0,
+      "Fracture": NaN,
+      "Lung Lesion": 1.0,
+      "Lung Opacity": 1.0,
+      "No Finding": 0.9819,
+      "Pleural Effusion": 1.0,
+      "Pleural Other": 1.0,
+      "Pneumonia": 1.0,
+      "Pneumothorax": 1.0,
+      "Support Devices": 1.0
+    },
+    "history": [
+      {
+        "epoch": 1,
+        "macro_auc": 0.99860571759068,
+        "macro_ap": 0.918477481879533
+      },
+      {
+        "epoch": 2,
+        "macro_auc": 0.6158745452879054,
+        "macro_ap": 0.35781692528256065
+      },
+      {
+        "epoch": 3,
+        "macro_auc": 0.525522189152722,
+        "macro_ap": 0.23807725162566856
+      },
+      {
+        "epoch": 4,
+        "macro_auc": 0.5137474949311517,
+        "macro_ap": 0.22742202857318178
+      },
+      {
+        "epoch": 5,
+        "macro_auc": 0.5259352220092683,
+        "macro_ap": 0.22984127902578957
+      }
+    ]
+  }
+]
