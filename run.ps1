@@ -12,7 +12,8 @@
 #>
 param(
     [string]$BackendPort = "9001",
-    [string]$Ckpt        = "checkpoints/all__cross_attention/best_model.pt"
+    # Precedence: explicit -Ckpt > $env:CKPT_PATH > default
+    [string]$Ckpt = $(if ($env:CKPT_PATH) { $env:CKPT_PATH } else { "checkpoints/all__cross_attention/best_model.pt" })
 )
 
 $ErrorActionPreference = "Stop"
