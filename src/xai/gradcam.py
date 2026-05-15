@@ -22,17 +22,24 @@ class ViTGradCAM:
     """
 
     def __init__(self, full_model: nn.Module, image_size: int = 224, patch_size: int = 16):
-        if not hasattr(full_model, "img_encoder"):
-            raise ValueError("Expected a model with .img_encoder (MultimodalClinicalModel).")
         self.model = full_model
         self.image_size = image_size
         self.patch_size = patch_size
         self.grid = image_size // patch_size  # 14 for 224/16
 
-        # Target = last block's output (post-norm)
-        vit = self.model.img_encoder.vit
+        # Locate the ViT backbone — supports both architectures:
+        #   - MultimodalClinicalModel:  model.img_encoder.vit
+        #   - ChestXRayClassifier:      model.backbone
+        if hasattr(full_model, "img_encoder") and hasattr(full_model.img_encoder, "vit"):
+            vit = full_model.img_encoder.vit
+        elif hasattr(full_model, "backbone"):
+            vit = full_model.backbone
+        else:
+            raise ValueError(
+                "Could not locate ViT backbone. Expected .img_encoder.vit or .backbone."
+            )
         if not hasattr(vit, "blocks") or len(vit.blocks) == 0:
-            raise ValueError("img_encoder.vit does not expose .blocks; use a standard ViT.")
+            raise ValueError("ViT backbone does not expose .blocks; use a standard ViT.")
         self.target_layer = vit.blocks[-1]
 
         self._activations: torch.Tensor | None = None

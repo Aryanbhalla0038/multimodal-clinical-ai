@@ -26,6 +26,7 @@ from src.data.image_transforms import build_eval_transform
 from src.data.note_tokenizer import tokenize_note, get_tokenizer
 from src.data.vitals_preprocessor import preprocess_vitals
 from src.models.multimodal_model import MultimodalClinicalModel
+from src.models.image_only_classifier import ChestXRayClassifier
 from src.utils.labels import LABEL_NAMES
 from src.xai.gradcam import ViTGradCAM, overlay_heatmap
 from src.xai.attention_rollout import get_vitals_importance
@@ -37,27 +38,54 @@ app.add_middleware(CORSMiddleware, allow_origins=["*"],
 DEVICE = os.environ.get("DEVICE") or ("cuda" if torch.cuda.is_available() else "cpu")
 CKPT_PATH = os.environ.get("CKPT_PATH", "checkpoints/all__cross_attention/best_model.pt")
 
-_model: Optional[MultimodalClinicalModel] = None
+_model = None  # type: ignore[var-annotated]
+_model_kind: str = "multimodal"  # "multimodal" or "image_only"
 _tokenizer = None
 _eval_tf = build_eval_transform(224)
 
 
-def _load_model() -> MultimodalClinicalModel:
-    global _model, _tokenizer
+def _detect_model_kind(state_dict: dict) -> str:
+    """Infer architecture from a state-dict's top-level key names."""
+    keys = list(state_dict.keys())
+    if any(k.startswith("txt_encoder") or k.startswith("fusion") for k in keys):
+        return "multimodal"
+    if any(k.startswith("backbone") and ("blocks" in k or "patch_embed" in k) for k in keys):
+        return "image_only"
+    return "multimodal"  # safe default
+
+
+def _load_model():
+    global _model, _tokenizer, _model_kind
     if _model is not None:
         return _model
-    model = MultimodalClinicalModel(image_pretrained=False, text_pretrained=False)
+
     ckpt_path = Path(CKPT_PATH)
+    state_dict = None
     if ckpt_path.exists():
         state = torch.load(ckpt_path, map_location=DEVICE, weights_only=False)
-        sd = state.get("model_state_dict", state)
-        missing, unexpected = model.load_state_dict(sd, strict=False)
-        print(f"[api] Loaded {ckpt_path} missing={len(missing)} unexpected={len(unexpected)}")
+        state_dict = state.get("model_state_dict", state)
+        _model_kind = _detect_model_kind(state_dict)
     else:
-        print(f"[api] WARNING: no checkpoint at {ckpt_path}; DEMO mode (random weights).")
+        # No checkpoint: pick from env var or default to multimodal demo
+        _model_kind = os.environ.get("MODEL_KIND", "multimodal")
+
+    if _model_kind == "image_only":
+        model = ChestXRayClassifier(pretrained=False)
+    else:
+        model = MultimodalClinicalModel(image_pretrained=False, text_pretrained=False)
+
+    if state_dict is not None:
+        missing, unexpected = model.load_state_dict(state_dict, strict=False)
+        print(f"[api] Loaded {ckpt_path} kind={_model_kind} "
+              f"missing={len(missing)} unexpected={len(unexpected)}")
+    else:
+        print(f"[api] WARNING: no checkpoint at {ckpt_path}; "
+              f"DEMO mode (random weights, kind={_model_kind}).")
+
     model.to(DEVICE).eval()
     _model = model
-    _tokenizer = get_tokenizer()
+    if _model_kind == "multimodal":
+        _tokenizer = get_tokenizer()
     return model
 
 
@@ -93,7 +121,8 @@ def _startup() -> None:
 @app.get("/health")
 def health() -> dict:
     return {"ok": True, "device": DEVICE, "labels": LABEL_NAMES,
-            "ckpt": str(CKPT_PATH), "loaded": _model is not None}
+            "ckpt": str(CKPT_PATH), "loaded": _model is not None,
+            "model_kind": _model_kind}
 
 
 @app.get("/labels")
