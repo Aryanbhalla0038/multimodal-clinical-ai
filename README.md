@@ -10,6 +10,7 @@ See `multimodal_clinical_ai_guide.md` for the full 24-week roadmap.
 - **Python 3.10+** on PATH
 - **Node.js 18+** on PATH (for the React dashboard) — install from https://nodejs.org/
 - **Trained checkpoint** at `checkpoints/all__cross_attention/best_model.pt`. Download from the [v0.1.0 Release](https://github.com/Aryanbhalla0038/multimodal-clinical-ai/releases/tag/v0.1.0) (786 MB) or train your own via `notebooks/kaggle_train.ipynb`.
+- **Optional image-only checkpoint** at `checkpoints/image_only_pure/best_model.pt`. Download from the [v0.2.0 Release](https://github.com/Aryanbhalla0038/multimodal-clinical-ai/releases/tag/v0.2.0) (327 MB).
 
 ### One-time setup
 ```powershell
@@ -26,6 +27,12 @@ Behavior:
 - Waits up to 60 s for `/health` to come up, then prints `Backend is healthy.`
 - Starts the Vite dev server on http://localhost:5173 in the current window
 - Open http://localhost:5173 in your browser → upload an X-ray, paste a clinical note, click **Run Analysis**
+
+To run the pure image-only checkpoint instead:
+```powershell
+$env:CKPT_PATH = "checkpoints/image_only_pure/best_model.pt"
+.\run.ps1
+```
 
 ### Stopping everything
 - Press **Ctrl+C** in the current window to stop the frontend
