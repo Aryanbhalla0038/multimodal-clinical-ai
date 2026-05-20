@@ -33,6 +33,7 @@ env/
 dashboard/node_modules/
 dashboard/build/
 dashboard/dist/
+*.tsbuildinfo
 
 # IDE
 .vscode/

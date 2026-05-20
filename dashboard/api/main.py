@@ -11,6 +11,7 @@ from __future__ import annotations
 import base64
 import io
 import os
+import urllib.request
 from pathlib import Path
 from typing import Optional
 
@@ -18,8 +19,10 @@ import cv2
 import numpy as np
 import pandas as pd
 import torch
-from fastapi import FastAPI, File, Form, UploadFile
+from fastapi import FastAPI, File, Form, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse
+from fastapi.staticfiles import StaticFiles
 from PIL import Image
 
 from src.data.image_transforms import build_eval_transform
@@ -37,6 +40,7 @@ app.add_middleware(CORSMiddleware, allow_origins=["*"],
 
 DEVICE = os.environ.get("DEVICE") or ("cuda" if torch.cuda.is_available() else "cpu")
 CKPT_PATH = os.environ.get("CKPT_PATH", "checkpoints/all__cross_attention/best_model.pt")
+FRONTEND_DIST = Path(__file__).resolve().parents[1] / "dist"
 
 _model = None  # type: ignore[var-annotated]
 _model_kind: str = "multimodal"  # "multimodal" or "image_only"
@@ -60,6 +64,16 @@ def _load_model():
         return _model
 
     ckpt_path = Path(CKPT_PATH)
+    ckpt_url = os.environ.get("CKPT_URL", "").strip()
+    if not ckpt_path.exists() and ckpt_url:
+        try:
+            ckpt_path.parent.mkdir(parents=True, exist_ok=True)
+            print(f"[api] Downloading checkpoint from CKPT_URL to {ckpt_path} ...")
+            urllib.request.urlretrieve(ckpt_url, ckpt_path)
+            print("[api] Checkpoint download complete.")
+        except Exception as exc:  # noqa: BLE001
+            print(f"[api] WARNING: checkpoint download failed: {exc}")
+
     state_dict = None
     if ckpt_path.exists():
         state = torch.load(ckpt_path, map_location=DEVICE, weights_only=False)
@@ -119,6 +133,7 @@ def _startup() -> None:
 
 
 @app.get("/health")
+@app.get("/api/health", include_in_schema=False)
 def health() -> dict:
     return {"ok": True, "device": DEVICE, "labels": LABEL_NAMES,
             "ckpt": str(CKPT_PATH), "loaded": _model is not None,
@@ -126,11 +141,13 @@ def health() -> dict:
 
 
 @app.get("/labels")
+@app.get("/api/labels", include_in_schema=False)
 def labels() -> dict:
     return {"labels": LABEL_NAMES}
 
 
 @app.post("/predict")
+@app.post("/api/predict", include_in_schema=False)
 async def predict(
     image: UploadFile = File(default=None),
     note: str = Form(default=""),
@@ -211,3 +228,22 @@ async def predict(
         "missing_modalities": missing,
         "disclaimer": "For research purposes only. Not for clinical decision-making.",
     }
+
+
+if FRONTEND_DIST.exists():
+    assets_dir = FRONTEND_DIST / "assets"
+    if assets_dir.exists():
+        app.mount("/assets", StaticFiles(directory=assets_dir), name="frontend-assets")
+
+    @app.get("/", include_in_schema=False)
+    def frontend_root() -> FileResponse:
+        return FileResponse(FRONTEND_DIST / "index.html")
+
+    @app.get("/{full_path:path}", include_in_schema=False)
+    def frontend_catch_all(full_path: str) -> FileResponse:
+        if full_path.startswith("api/"):
+            raise HTTPException(status_code=404, detail="Not found")
+        file_path = FRONTEND_DIST / full_path
+        if file_path.is_file():
+            return FileResponse(file_path)
+        return FileResponse(FRONTEND_DIST / "index.html")

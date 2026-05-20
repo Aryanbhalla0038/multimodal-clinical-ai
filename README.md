@@ -54,6 +54,23 @@ cd dashboard
 npm run dev
 ```
 
+## Free deployment (frontend + backend together)
+
+Deploy as a **Hugging Face Docker Space** (single container):
+
+1. Create a new Space on Hugging Face with SDK = **Docker**.
+2. Push this repo (contains `Dockerfile`) to the Space repository.
+3. In Space settings, set hardware = **CPU Basic** (free).
+4. Set these environment variables (optional overrides):
+   - `MODEL_KIND=image_only`
+   - `CKPT_PATH=checkpoints/image_only_pure/best_model.pt`
+   - `CKPT_URL=https://github.com/Aryanbhalla0038/multimodal-clinical-ai/releases/download/v0.2.0/best_model_image_only_pure.pt`
+
+Notes:
+- The backend serves the built React app from `dashboard/dist`, so one URL hosts both UI and API.
+- API is available at `/api/*` (`/api/health`, `/api/predict`, `/api/labels`).
+- First boot may take time while the checkpoint downloads.
+
 ## Train on Kaggle GPU (real CheXpert)
 
 Open `notebooks/kaggle_train.ipynb` on Kaggle, attach the **CheXpert** dataset (`ashery/chexpert` or the official one), enable GPU T4 x2, and **Save Version → Save & Run All (Commit)**. Wait ~3 hours, then download `best_model.pt` from the Output tab into `checkpoints/all__cross_attention/`.

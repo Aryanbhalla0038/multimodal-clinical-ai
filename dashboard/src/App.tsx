@@ -3,7 +3,7 @@ import { PredictionBar } from "./components/PredictionBar";
 import { VitalsChart } from "./components/VitalsChart";
 import { Upload, FileText, Activity, AlertTriangle, Loader2 } from "lucide-react";
 
-const API = "/api";
+const API = (import.meta.env.VITE_API_URL || "/api").replace(/\/$/, "");
 
 interface Result {
   predictions: Record<string, number>;
