@@ -1,3 +1,13 @@
+---
+title: Multimodal Clinical AI
+emoji: 🩺
+colorFrom: blue
+colorTo: green
+sdk: docker
+app_port: 7860
+pinned: false
+---
+
 # Multimodal Clinical AI
 
 ViT + BioBERT + Temporal Encoder with Cross-Modal Attention Fusion for 14-label CheXpert chest X-ray diagnosis. Implements Grad-CAM, SHAP, and attention rollout for explainability, plus a FastAPI + React dashboard.
